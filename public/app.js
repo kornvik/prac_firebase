@@ -39,3 +39,20 @@ const db = firebase.firestore();
 
 const createThing = document.getElementById('createThing');
 const thingList = document.getElementById('thingList');
+
+let thingsRef; // referense to a database location
+let unsubscribe; // turn off realtime stream
+
+auth.onAuthStateChanged(user => {
+    if(user) {
+        thingsRef = db.collection('things')
+        createThing.onclick = () => {
+            thingsRef.add({
+                uid: user.uid,
+                name: faker.commerce.productName(),
+                createdAt: serverTimestamp()
+            });
+        }
+    }
+})
+
