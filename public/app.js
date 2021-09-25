@@ -31,7 +31,6 @@ auth.onAuthStateChanged(user => {
         whenSignedIn.hidden = true;
         whenSignedOut.hidden = false;
         userDetails.innerHTML = '';
-
     }
 })
 
@@ -47,12 +46,28 @@ auth.onAuthStateChanged(user => {
     if(user) {
         thingsRef = db.collection('things')
         createThing.onclick = () => {
+            console.log("add")
+            // const {serverTimestamp} = ;
             thingsRef.add({
                 uid: user.uid,
                 name: faker.commerce.productName(),
-                createdAt: serverTimestamp()
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
         }
+        unsubscribe = thingsRef
+            .where('uid','==',user.uid)
+            .orderBy('createdAt')
+            .onSnapshot(querySnapshot => {
+                const items = querySnapshot.docs.map( doc=> {
+                    return `<li>${doc.data().name}</li>`
+                });
+                thingList.innerHTML = items.join('');
+            });
+
+    } else {
+        unsubscribe && unsubscribe();
     }
 })
+
+
 
